@@ -68,13 +68,6 @@ y = np.linspace(0, 100, N_Y + 1)
 z = np.linspace(0, 10, N_Z + 1)
 X, Y, Z = np.meshgrid(x, y, z)
 
-# 水底的高度分布
-depth = np.zeros((N_X, N_Y))
-for i in range(N_X):
-    for j in range(N_Y):
-        depth[i, j] = np.sin(X[i, j, 0] * 0.1) * np.sin(Y[i, j, 0] * 0.1)
-
-
 # 在每个格点上生成站点
 lattice = []
 for i in range(N_X):
@@ -82,5 +75,4 @@ for i in range(N_X):
         for k in range(N_Z):
             lattice.append(Site(X[i, j, k], Y[i, j, k], Z[i, j, k]))
 
-# 随机生成表面的流速，要求流量守恒
             
