@@ -40,8 +40,8 @@ surf = ax.plot_surface(x_grid, y_grid, z_grid, cmap='viridis', alpha = 0.5)
 # 添加标签和标题
 ax.set_xlabel('Longitude')
 ax.set_ylabel('Latitude')
-ax.set_zlabel('Altitude')
-ax.set_title('Ocean Current')
+ax.set_zlabel('Altitude/m')
+ax.set_title('Ocean Current and submersible track')
 
 # 指定要绘制洋流的位置，这里简单地使用网格点的四分之一位置
 num_points = 20  # 指定要绘制的点数
@@ -53,15 +53,15 @@ selected_positions = [(x_idx, y_idx) for x_idx in x_indices for y_idx in y_indic
 u_velocity = np.ones(len(selected_positions)) * -0.05  # 沿 x 方向的洋流速度为0.05
 v_velocity = np.ones(len(selected_positions)) * 0.05
 
-# # 在海平面上绘制洋流矢量箭头
-# for pos_index, (i, j) in enumerate(selected_positions):
-#     length_0 = np.sqrt(x_grid[i, j]**2 + y_grid[i, j]**2) / 100 * np.random.uniform(0.8, 1.2) / np.sqrt(30 + np.abs(z_grid[i, j]))
-#     if z_grid[i, j] >= 0:
-#         continue
-#     ax.quiver(x_grid[i, j], y_grid[i, j], 0, u_velocity[pos_index]* np.random.uniform(0.7, 1.3), v_velocity[pos_index]* np.random.uniform(0.7, 1.3), 0, length = length_0, normalize=True, color='r', arrow_length_ratio=0.2)
+# 在海平面上绘制洋流矢量箭头
+for pos_index, (i, j) in enumerate(selected_positions):
+    length_0 = np.sqrt(x_grid[i, j]**2 + y_grid[i, j]**2) / 100 * np.random.uniform(0.8, 1.2) / np.sqrt(30 + np.abs(z_grid[i, j]))
+    if z_grid[i, j] >= 0:
+        continue
+    ax.quiver(x_grid[i, j], y_grid[i, j], 0, u_velocity[pos_index]* np.random.uniform(0.7, 1.3), v_velocity[pos_index]* np.random.uniform(0.7, 1.3), 0, length = length_0, normalize=True, color='deepskyblue', arrow_length_ratio=0.2)
         
 
-# # 显示图形
+# 显示图形
 # plt.show()
 
 pos = [20.4, 38.4, 0]
