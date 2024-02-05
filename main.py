@@ -1,51 +1,64 @@
+import xarray as xr
+import os
 import numpy as np
 import matplotlib.pyplot as plt
-import os
-from osgeo import gdal
-from osgeo import osr
-from osgeo import ogr
-from osgeo import gdal_array
-from osgeo import gdalconst
+from mpl_toolkits.mplot3d import Axes3D
 
-# 切换到当前目录
+
 os.chdir(os.path.dirname(__file__))
-print(os.getcwd())
 
-# 打开.grd文件
-dataset = gdal.Open('GMRTv4_2_20240202topo.tif')
+# 读取GMT v3兼容的NetCDF文件
+file_path = "../GMRTv4_2_20240205topo.grd"  # 替换为你的NetCDF文件路径
+dataset = xr.open_dataset(file_path, engine='scipy')
 
-# 读取数据
-band = dataset.GetRasterBand(1)
-data = band.ReadAsArray()
+# 打印数据集的信息
+print(dataset)
 
-# 获取地理坐标信息
-geotransform = dataset.GetGeoTransform()
-x_origin = geotransform[0]
-y_origin = geotransform[3]
-pixel_width = geotransform[1]
-pixel_height = geotransform[5]
+# 打印各个变量的值
+print("x_range:", dataset['x_range'].values)
+print("y_range:", dataset['y_range'].values)
+print("dimension:", dataset['dimension'].values)
+print("dimension product:", np.prod(dataset['dimension'].values))
+print("spacing:", dataset['spacing'].values)
+print("z.shape:", dataset['z'].shape)
+print("z:", dataset['z'].values)
+print(dataset['z'].shape)  # 打印数据数组的形状
 
-# 打印数据信息
-print('数据大小:', data.shape)
-print('地理坐标原点:', x_origin, y_origin)
-print('像素宽度:', pixel_width)
-print('像素高度:', pixel_height)
 
-# 创建地理坐标网格
-x_size = dataset.RasterXSize
-y_size = dataset.RasterYSize
-x_end = x_origin + x_size * pixel_width
-y_end = y_origin + y_size * pixel_height
-x = np.linspace(x_origin, x_end, x_size)
-y = np.linspace(y_origin, y_end, y_size)
+# 获取 x 轴和 y 轴的范围和间距
+x_start, x_end = dataset['x_range'][0], dataset['x_range'][1]
+y_start, y_end = dataset['y_range'][0], dataset['y_range'][1]
+x_spacing, y_spacing = dataset['spacing'][0], dataset['spacing'][1]
 
-# 绘制图像
-plt.imshow(data, extent=[x_origin, x_end, y_origin, y_end], cmap='terrain')
-plt.colorbar(label='Depth (meters)')
-plt.xlabel('Longitude')
-plt.ylabel('Latitude')
-plt.title('Depth Map')
+# 根据范围和间距创建 x 和 y 的格点
+x = np.linspace(x_start, x_end, dataset['dimension'].values[0])
+y = np.linspace(y_start, y_end, dataset['dimension'].values[1])
+y = np.flipud(y)
+
+# 将 x 和 y 轴的格点转换为二维数组
+x_grid, y_grid = np.meshgrid(x, y)
+
+# 获取 z 轴的数据
+z_data = dataset['z'].values
+
+# 将 z 轴的数据按照网格大小重新排列成二维数组
+z_grid = z_data.reshape(len(y), len(x))
+
+# 创建 3D 图形对象
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# 绘制 3D 表面图
+surf = ax.plot_surface(x_grid, y_grid, z_grid, cmap='viridis')
+
+# 翻转 y 轴方向
+# plt.gca().invert_xaxis()
+
+# 添加标签和标题
+ax.set_xlabel('X Label')
+ax.set_ylabel('Y Label')
+ax.set_zlabel('Z Label')
+ax.set_title('3D Surface Plot')
+
+# 显示图形
 plt.show()
-
-# 关闭数据集
-dataset = None

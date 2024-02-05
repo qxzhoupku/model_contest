@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import gsw
+import xarray as xr
 
 os.chdir(os.path.dirname(__file__))
 
@@ -75,4 +76,34 @@ for i in range(N_X):
         for k in range(N_Z):
             lattice.append(Site(X[i, j, k], Y[i, j, k], Z[i, j, k]))
 
-            
+
+# 读取.nc文件
+file_path = "../PacificIslands_2010-2019_SeaSurfaceCurrents_OSCAR/PacificIslands_2015-2019_ZonalSeaSurfaceCurrents_OSCAR.nc"
+# file_path = "../PacificIslands_2010-2019_SeaSurfaceCurrents_OSCAR/PacificIslands_2015-2019_MeridionalSeaSurfaceCurrents_OSCAR.nc"
+
+# file_path = "../CZ16_0p5_1_2000m_GV_year_2020_month_9.nc"
+dataset = xr.open_dataset(file_path)
+
+# 查看数据集的结构和内容
+print(dataset)
+
+# 获取所有变量的名称
+variable_names = list(dataset.variables)
+
+# 访问某个特定变量
+# 假设我们要访问名为"u"的变量
+u_variable = dataset["u"]
+
+# 读取变量的值
+u_values = u_variable.values
+
+# 获取变量的维度信息
+u_dimensions = u_variable.dims
+
+# 获取变量的坐标信息
+u_coordinates = u_variable.coords
+
+print(u_variable[0])
+
+# 关闭数据集
+dataset.close()

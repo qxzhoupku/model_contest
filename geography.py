@@ -8,7 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 os.chdir(os.path.dirname(__file__))
 
 # 读取GMT v3兼容的NetCDF文件
-file_path = "GMRTv4_2_20240203topo.grd"  # 替换为你的NetCDF文件路径
+file_path = "../GMRTv4_2_20240203topo.grd"  # 替换为你的NetCDF文件路径
 dataset = xr.open_dataset(file_path, engine='scipy')
 
 # 打印数据集的信息
